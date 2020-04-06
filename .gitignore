@@ -73,3 +73,7 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Vim
+.*.sw[po]
+Session.vim
