@@ -5,10 +5,10 @@ from PIL import Image
 import numpy as np
 import gym
 
-from keras.models import Sequential
-from keras.layers import Dense, Activation, Flatten, Convolution2D, Permute
-from keras.optimizers import Adam
-import keras.backend as K
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Dense, Activation, Flatten, Conv2D, Permute
+from tensorflow.keras.optimizers import Adam
+import tensorflow.keras.backend as K
 
 from rl.agents.dqn import DQNAgent
 from rl.policy import LinearAnnealedPolicy, BoltzmannQPolicy, EpsGreedyQPolicy
@@ -55,7 +55,7 @@ nb_actions = env.action_space.n
 # Next, we build our model. We use the same model that was described by Mnih et al. (2015).
 input_shape = (WINDOW_LENGTH,) + INPUT_SHAPE
 model = Sequential()
-if K.image_dim_ordering() == 'tf':
+if K.image_dim_ordering() == 'tf':    # NOTE: probably broken in tf.keras 
     # (width, height, channels)
     model.add(Permute((2, 3, 1), input_shape=input_shape))
 elif K.image_dim_ordering() == 'th':
@@ -63,11 +63,11 @@ elif K.image_dim_ordering() == 'th':
     model.add(Permute((1, 2, 3), input_shape=input_shape))
 else:
     raise RuntimeError('Unknown image_dim_ordering.')
-model.add(Convolution2D(32, 8, 8, subsample=(4, 4)))
+model.add(Conv2D(32, (8, 8), strides=(4, 4)))     # NOTE: this is un-tested Keras v1.* code converted to 2.*
 model.add(Activation('relu'))
-model.add(Convolution2D(64, 4, 4, subsample=(2, 2)))
+model.add(Conv2D(64, (4, 4), strides=(2, 2)))
 model.add(Activation('relu'))
-model.add(Convolution2D(64, 3, 3, subsample=(1, 1)))
+model.add(Conv2D(64, (3, 3), strides=(1, 1)))
 model.add(Activation('relu'))
 model.add(Flatten())
 model.add(Dense(512))
