@@ -37,7 +37,7 @@ model.add(Activation('softmax'))
 # model.add(Activation('softmax'))
 
 
-print(model.summary())
+model.summary()
 
 
 # Finally, we configure and compile our agent. You can use every built-in Keras optimizer and
