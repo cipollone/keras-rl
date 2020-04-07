@@ -2,7 +2,6 @@ import collections
 
 import numpy as np
 
-from keras.callbacks import History
 from keras.models import Model
 from keras.layers import Input, Lambda
 import keras.backend as K

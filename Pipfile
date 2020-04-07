@@ -1,0 +1,15 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+ipython = "*"
+keras-rl = {editable = true,path = "."}
+
+[packages]
+numpy = "*"
+pillow = "*"
+tensorflow = "~=2.1"
+keras = ">=2.0.7"
+gym = {extras = ["atari"],version = "*"}

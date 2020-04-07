@@ -3,7 +3,6 @@ import gym
 
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Flatten
-from keras.optimizers import Adam
 
 from rl.agents.cem import CEMAgent
 from rl.memory import EpisodeParameterMemory
@@ -38,7 +37,7 @@ model.add(Activation('softmax'))
 # model.add(Activation('softmax'))
 
 
-print(model.summary())
+model.summary()
 
 
 # Finally, we configure and compile our agent. You can use every built-in Keras optimizer and

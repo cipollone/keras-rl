@@ -1,6 +1,6 @@
 import numpy as np
 
-from keras.models import model_from_config, Sequential, Model, model_from_config
+from keras.models import model_from_config
 import keras.optimizers as optimizers
 import keras.backend as K
 
