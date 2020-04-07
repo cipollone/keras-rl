@@ -7,9 +7,9 @@ from tempfile import mkdtemp
 
 import numpy as np
 
-from tensorflow.keras import __version__ as KERAS_VERSION
-from tensorflow.keras.callbacks import Callback as KerasCallback
-from tensorflow.keras.utils import Progbar
+from keras import __version__ as KERAS_VERSION
+from keras.callbacks import Callback as KerasCallback, CallbackList as KerasCallbackList
+from keras.utils.generic_utils import Progbar
 
 
 class Callback(KerasCallback):
@@ -39,101 +39,6 @@ class Callback(KerasCallback):
     def on_action_end(self, action, logs={}):
         """Called at end of each action"""
         pass
-
-
-class KerasCallbackList:
-    """This represents a list of callbacks.
-
-    tf.keras doesn't export CallbackList, so I'll define a minimal class
-    for the same purpose.
-    """
-
-    def __init__(self, callbacks=None):
-        """Initialize.
-
-        # Arguments
-            callbacks: a list of KerasCallbacks
-        """
-
-        self.callbacks = list(callbacks) if callbacks else []
-
-    def append(self, callback):
-        self.callbacks.append(callback)
-
-    def set_params(self, params):
-        for callback in self.callbacks:
-            callback.set_params(params)
-
-    def set_model(self, model):
-        for callback in self.callbacks:
-            callback.set_model(model)
-
-    def on_epoch_begin(self, epoch, logs=None):
-        """Called at the start of an epoch.
-
-        # Arguments
-            epoch: integer, index of epoch.
-            logs: dictionary of logs.
-        """
-        logs = logs if logs else {}
-        for callback in self.callbacks:
-            callback.on_epoch_begin(epoch, logs)
-
-    def on_epoch_end(self, epoch, logs=None):
-        """Called at the end of an epoch.
-
-        # Arguments
-            epoch: integer, index of epoch.
-            logs: dictionary of logs.
-        """
-        logs = logs if logs else {}
-        for callback in self.callbacks:
-            callback.on_epoch_end(epoch, logs)
-
-    def on_batch_begin(self, batch, logs=None):
-        """Called right before processing a batch.
-
-        # Arguments
-            batch: integer, index of batch within the current epoch.
-            logs: dictionary of logs.
-        """
-        logs = logs if logs else {}
-        for callback in self.callbacks:
-            callback.on_batch_begin(batch, logs)
-
-    def on_batch_end(self, batch, logs=None):
-        """Called at the end of a batch.
-
-        # Arguments
-            batch: integer, index of batch within the current epoch.
-            logs: dictionary of logs.
-        """
-        logs = logs if logs else {}
-        for callback in self.callbacks:
-            callback.on_batch_end(batch, logs)
-
-    def on_train_begin(self, logs=None):
-        """Called at the beginning of training.
-
-        # Arguments
-            logs: dictionary of logs.
-        """
-        logs = logs if logs else {}
-        for callback in self.callbacks:
-            callback.on_train_begin(logs)
-
-    def on_train_end(self, logs=None):
-        """Called at the end of training.
-
-        # Arguments
-            logs: dictionary of logs.
-        """
-        logs = logs if logs else {}
-        for callback in self.callbacks:
-            callback.on_train_end(logs)
-
-    def __iter__(self):
-        return iter(self.callbacks)
 
 
 class CallbackList(KerasCallbackList):

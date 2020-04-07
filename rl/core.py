@@ -3,7 +3,7 @@ import warnings
 from copy import deepcopy
 
 import numpy as np
-from tensorflow.keras.callbacks import History
+from keras.callbacks import History
 
 from rl.callbacks import (
     CallbackList,

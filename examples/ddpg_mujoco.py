@@ -3,9 +3,9 @@ import numpy as np
 import gym
 from gym import wrappers
 
-from tensorflow.keras import Sequential, Model
-from tensorflow.keras.layers import Dense, Activation, Flatten, Input, Concatenate
-from tensorflow.keras.optimizers import Adam
+from keras.models import Sequential, Model
+from keras.layers import Dense, Activation, Flatten, Input, Concatenate
+from keras.optimizers import Adam
 
 from rl.processors import WhiteningNormalizerProcessor
 from rl.agents import DDPGAgent

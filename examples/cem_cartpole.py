@@ -1,8 +1,8 @@
 import numpy as np
 import gym
 
-from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Dense, Activation, Flatten
+from keras.models import Sequential
+from keras.layers import Dense, Activation, Flatten
 
 from rl.agents.cem import CEMAgent
 from rl.memory import EpisodeParameterMemory

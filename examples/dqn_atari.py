@@ -5,10 +5,10 @@ from PIL import Image
 import numpy as np
 import gym
 
-from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Dense, Activation, Flatten, Conv2D, Permute
-from tensorflow.keras.optimizers import Adam
-import tensorflow.keras.backend as K
+from keras.models import Sequential
+from keras.layers import Dense, Activation, Flatten, Conv2D, Permute
+from keras.optimizers import Adam
+import keras.backend as K
 
 from rl.agents.dqn import DQNAgent
 from rl.policy import LinearAnnealedPolicy, BoltzmannQPolicy, EpsGreedyQPolicy

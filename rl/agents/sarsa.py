@@ -2,9 +2,9 @@ import collections
 
 import numpy as np
 
-from tensorflow.keras import Model
-from tensorflow.keras.layers import Input, Lambda
-import tensorflow.keras.backend as K
+from keras.models import Model
+from keras.layers import Input, Lambda
+import keras.backend as K
 
 from rl.core import Agent
 from rl.agents.dqn import mean_q

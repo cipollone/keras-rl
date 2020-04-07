@@ -1,10 +1,9 @@
 from __future__ import division
 import warnings
 
-import tensorflow as tf
-import tensorflow.keras.backend as K
-from tensorflow.keras import Model
-from tensorflow.keras.layers import Lambda, Input, Layer, Dense
+import keras.backend as K
+from keras.models import Model
+from keras.layers import Lambda, Input, Layer, Dense
 
 from rl.core import Agent
 from rl.policy import EpsGreedyQPolicy, GreedyQPolicy
@@ -67,8 +66,7 @@ class AbstractDQNAgent(Agent):
         return q_values
 
     def compute_q_values(self, state):
-        q_values = self.compute_batch_q_values([state])
-        q_values = tf.reshape(q_values, [-1])
+        q_values = self.compute_batch_q_values([state]).flatten()
         assert q_values.shape == (self.nb_actions,)
         return q_values
 
@@ -110,7 +108,7 @@ class DQNAgent(AbstractDQNAgent):
         # NOTE: suppressed because in tensors have lenght but they raise an exception
         #if hasattr(model.output, '__len__') and len(model.output) > 1:
         #    raise ValueError('Model "{}" has more than one output. DQN expects a model that has a single output.'.format(model))
-        if model.output.shape.as_list() != [None, self.nb_actions]:
+        if model.output._keras_shape != (None, self.nb_actions):
             raise ValueError('Model output "{}" has invalid shape. DQN expects a model that has one dimension for each action, in this case {}.'.format(model.output, self.nb_actions))
 
         # Parameters.
@@ -120,7 +118,7 @@ class DQNAgent(AbstractDQNAgent):
         if self.enable_dueling_network:
             # get the second last layer of the model, abandon the last layer
             layer = model.layers[-2]
-            nb_action = model.output.shape[-1]
+            nb_action = model.output._keras_shape[-1]
             # layer y has a shape (nb_action+1,)
             # y[:,0] represents V(s;theta)
             # y[:,1:] represents A(s,a;theta)
@@ -293,10 +291,7 @@ class DQNAgent(AbstractDQNAgent):
                 # highest Q value wrt to the online model (as computed above).
                 target_q_values = self.target_model.predict_on_batch(state1_batch)
                 assert target_q_values.shape == (self.batch_size, self.nb_actions)
-                actions = tf.expand_dims(actions, -1)
-                rows = tf.expand_dims(tf.range(self.batch_size, dtype=tf.int64), -1)
-                indices = tf.concat([rows, actions], axis=-1)
-                q_batch = tf.gather_nd(target_q_values, indices)
+                q_batch = target_q_values[range(self.batch_size), actions]
             else:
                 # Compute the q_values given state1, and extract the maximum for each sample in the batch.
                 # We perform this prediction on the target_model instead of the model for reasons
@@ -600,9 +595,9 @@ class NAFAgent(AbstractDQNAgent):
         # Build combined model.
         a_in = Input(shape=(self.nb_actions,), name='action_input')
         if type(self.V_model.input) is list:
-            observation_shapes = [i.shape[1:] for i in self.V_model.input]
+            observation_shapes = [i._keras_shape[1:] for i in self.V_model.input]
         else:
-            observation_shapes = [self.V_model.input.shape[1:]]
+            observation_shapes = [self.V_model.input._keras_shape[1:]]
         os_in = [Input(shape=shape, name='observation_input_{}'.format(idx)) for idx, shape in enumerate(observation_shapes)]
         L_out = self.L_model([a_in] + os_in)
         V_out = self.V_model(os_in)
