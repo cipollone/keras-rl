@@ -251,7 +251,7 @@ class DQNAgent(AbstractDQNAgent):
             return metrics
 
         # Train the network on a single stochastic batch.
-        if self.step > self.nb_steps_warmup and self.step % self.train_interval == 0:
+        if self.step > self.init_step + self.nb_steps_warmup and self.step % self.train_interval == 0:
             experiences = self.memory.sample(self.batch_size)
             assert len(experiences) == self.batch_size
 
@@ -657,7 +657,7 @@ class NAFAgent(AbstractDQNAgent):
             return metrics
 
         # Train the network on a single stochastic batch.
-        if self.step > self.nb_steps_warmup and self.step % self.train_interval == 0:
+        if self.step > self.init_step + self.nb_steps_warmup and self.step % self.train_interval == 0:
             experiences = self.memory.sample(self.batch_size)
             assert len(experiences) == self.batch_size
 

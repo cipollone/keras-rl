@@ -52,7 +52,7 @@ class Agent(object):
 
     def fit(self, env, nb_steps, action_repetition=1, callbacks=None, verbose=1,
             visualize=False, nb_max_start_steps=0, start_step_policy=None, log_interval=10000,
-            nb_max_episode_steps=None):
+            nb_max_episode_steps=None, init_step=0, init_episode=0):
         """Trains the agent on the given environment.
 
         # Arguments
@@ -77,6 +77,8 @@ class Agent(object):
             nb_max_episode_steps (integer): Number of steps per episode that the agent performs before
                 automatically resetting the environment. Set to `None` if each episode should run
                 (potentially indefinitely) until the environment signals a terminal state.
+            init_step (integer): initial step, default 0
+            init_episode (integer): initial episode, default 0
 
         # Returns
             A `keras.callbacks.History` instance that recorded the entire training process.
@@ -85,6 +87,10 @@ class Agent(object):
             raise RuntimeError('Your tried to fit your agent but it hasn\'t been compiled yet. Please call `compile()` before `fit()`.')
         if action_repetition < 1:
             raise ValueError('action_repetition must be >= 1, is {}'.format(action_repetition))
+
+        # Store
+        self.init_step = init_step
+        self.init_episode = init_episode
 
         self.training = True
 
@@ -114,8 +120,8 @@ class Agent(object):
         self._on_train_begin()
         callbacks.on_train_begin()
 
-        episode = np.int16(0)
-        self.step = np.int16(0)
+        episode = init_episode
+        self.step = init_step
         observation = None
         episode_reward = None
         episode_step = None
@@ -124,8 +130,8 @@ class Agent(object):
             while self.step < nb_steps:
                 if observation is None:  # start of a new episode
                     callbacks.on_episode_begin(episode)
-                    episode_step = np.int16(0)
-                    episode_reward = np.float32(0)
+                    episode_step = 0
+                    episode_reward = 0.0
 
                     # Obtain the initial observation by resetting the environment.
                     self.reset_states()
@@ -169,7 +175,7 @@ class Agent(object):
                 action = self.forward(observation)
                 if self.processor is not None:
                     action = self.processor.process_action(action)
-                reward = np.float32(0)
+                reward = 0.0
                 accumulated_info = {}
                 done = False
                 for _ in range(action_repetition):
@@ -306,7 +312,7 @@ class Agent(object):
 
             # Obtain the initial observation by resetting the environment.
             self.reset_states()
-            observation = deepcopy(env.reset())
+            observation = deepcopy(env.reset())   # TODO: why all these deep copies?
             if self.processor is not None:
                 observation = self.processor.process_observation(observation)
             assert observation is not None
