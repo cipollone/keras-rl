@@ -213,9 +213,9 @@ class TrainEpisodeLogger(Callback):
 
 
 class TrainIntervalLogger(Callback):
-    def __init__(self, interval=10000):
+    def __init__(self, interval=10000, init_step=0):
         self.interval = interval
-        self.step = 0
+        self.step = init_step
         self.reset()
 
     def reset(self):
@@ -243,7 +243,8 @@ class TrainIntervalLogger(Callback):
         if self.step % self.interval == 0:
             if len(self.episode_rewards) > 0:
                 metrics = np.array(self.metrics)
-                assert metrics.shape == (self.interval, len(self.metrics_names))
+                # The following is not true when resuming
+                #assert metrics.shape == (self.interval, len(self.metrics_names))
                 formatted_metrics = ''
                 if not np.isnan(metrics).all():  # not all values are means
                     means = np.nanmean(self.metrics, axis=0)
