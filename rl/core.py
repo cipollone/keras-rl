@@ -179,9 +179,9 @@ class Agent(object):
                 done = False
                 for _ in range(action_repetition):
                     callbacks.on_action_begin(action)
-                    observation, r, done, info = env.step(action)
+                    raw_observation, r, done, info = env.step(action)
                     if self.processor is not None:
-                        observation, r, done, info = self.processor.process_step(observation, r, done, info)
+                        observation, r, done, info = self.processor.process_step(raw_observation, r, done, info)
                     for key, value in info.items():
                         if not np.isreal(value):
                             continue
@@ -201,6 +201,7 @@ class Agent(object):
                 step_logs = {
                     'action': action,
                     'observation': observation,
+                    'raw_observation': raw_observation,
                     'reward': reward,
                     'metrics': metrics,
                     'episode': episode,
@@ -349,9 +350,9 @@ class Agent(object):
                 accumulated_info = {}
                 for _ in range(action_repetition):
                     callbacks.on_action_begin(action)
-                    observation, r, d, info = env.step(action)
+                    raw_observation, r, d, info = env.step(action)
                     if self.processor is not None:
-                        observation, r, d, info = self.processor.process_step(observation, r, d, info)
+                        observation, r, d, info = self.processor.process_step(raw_observation, r, d, info)
                     callbacks.on_action_end(action)
                     reward += r
                     for key, value in info.items():
@@ -371,6 +372,7 @@ class Agent(object):
                 step_logs = {
                     'action': action,
                     'observation': observation,
+                    'raw_observation': raw_observation,
                     'reward': reward,
                     'episode': episode,
                     'info': accumulated_info,
