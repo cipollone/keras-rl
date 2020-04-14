@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import warnings
-from copy import deepcopy
 
 import numpy as np
 from tensorflow.keras.callbacks import History
@@ -52,7 +51,7 @@ class Agent(object):
 
     def fit(self, env, nb_steps, action_repetition=1, callbacks=None, verbose=1,
             visualize=False, nb_max_start_steps=0, start_step_policy=None, log_interval=10000,
-            nb_max_episode_steps=None):
+            nb_max_episode_steps=None, init_step=0, init_episode=0):
         """Trains the agent on the given environment.
 
         # Arguments
@@ -77,6 +76,8 @@ class Agent(object):
             nb_max_episode_steps (integer): Number of steps per episode that the agent performs before
                 automatically resetting the environment. Set to `None` if each episode should run
                 (potentially indefinitely) until the environment signals a terminal state.
+            init_step (integer): initial step, default 0
+            init_episode (integer): initial episode, default 0
 
         # Returns
             A `keras.callbacks.History` instance that recorded the entire training process.
@@ -86,12 +87,17 @@ class Agent(object):
         if action_repetition < 1:
             raise ValueError('action_repetition must be >= 1, is {}'.format(action_repetition))
 
+        # Store
+        self.init_step = init_step
+        self.init_episode = init_episode
+
         self.training = True
 
         callbacks = [] if not callbacks else callbacks[:]
 
         if verbose == 1:
-            callbacks += [TrainIntervalLogger(interval=log_interval)]
+            callbacks += [TrainIntervalLogger(
+                interval=log_interval, init_step=init_step)]
         elif verbose > 1:
             callbacks += [TrainEpisodeLogger()]
         if visualize:
@@ -114,8 +120,8 @@ class Agent(object):
         self._on_train_begin()
         callbacks.on_train_begin()
 
-        episode = np.int16(0)
-        self.step = np.int16(0)
+        episode = init_episode
+        self.step = init_step
         observation = None
         episode_reward = None
         episode_step = None
@@ -124,12 +130,12 @@ class Agent(object):
             while self.step < nb_steps:
                 if observation is None:  # start of a new episode
                     callbacks.on_episode_begin(episode)
-                    episode_step = np.int16(0)
-                    episode_reward = np.float32(0)
+                    episode_step = 0
+                    episode_reward = 0.0
 
                     # Obtain the initial observation by resetting the environment.
                     self.reset_states()
-                    observation = deepcopy(env.reset())
+                    observation = env.reset()
                     if self.processor is not None:
                         observation = self.processor.process_observation(observation)
                     assert observation is not None
@@ -146,13 +152,12 @@ class Agent(object):
                             action = self.processor.process_action(action)
                         callbacks.on_action_begin(action)
                         observation, reward, done, info = env.step(action)
-                        observation = deepcopy(observation)
                         if self.processor is not None:
                             observation, reward, done, info = self.processor.process_step(observation, reward, done, info)
                         callbacks.on_action_end(action)
                         if done:
                             warnings.warn('Env ended before {} random steps could be performed at the start. You should probably lower the `nb_max_start_steps` parameter.'.format(nb_random_start_steps))
-                            observation = deepcopy(env.reset())
+                            observation = env.reset()
                             if self.processor is not None:
                                 observation = self.processor.process_observation(observation)
                             break
@@ -169,15 +174,14 @@ class Agent(object):
                 action = self.forward(observation)
                 if self.processor is not None:
                     action = self.processor.process_action(action)
-                reward = np.float32(0)
+                reward = 0.0
                 accumulated_info = {}
                 done = False
                 for _ in range(action_repetition):
                     callbacks.on_action_begin(action)
-                    observation, r, done, info = env.step(action)
-                    observation = deepcopy(observation)
+                    raw_observation, r, done, info = env.step(action)
                     if self.processor is not None:
-                        observation, r, done, info = self.processor.process_step(observation, r, done, info)
+                        observation, r, done, info = self.processor.process_step(raw_observation, r, done, info)
                     for key, value in info.items():
                         if not np.isreal(value):
                             continue
@@ -197,6 +201,7 @@ class Agent(object):
                 step_logs = {
                     'action': action,
                     'observation': observation,
+                    'raw_observation': raw_observation,
                     'reward': reward,
                     'metrics': metrics,
                     'episode': episode,
@@ -306,7 +311,7 @@ class Agent(object):
 
             # Obtain the initial observation by resetting the environment.
             self.reset_states()
-            observation = deepcopy(env.reset())
+            observation = env.reset()
             if self.processor is not None:
                 observation = self.processor.process_observation(observation)
             assert observation is not None
@@ -323,13 +328,12 @@ class Agent(object):
                     action = self.processor.process_action(action)
                 callbacks.on_action_begin(action)
                 observation, r, done, info = env.step(action)
-                observation = deepcopy(observation)
                 if self.processor is not None:
                     observation, r, done, info = self.processor.process_step(observation, r, done, info)
                 callbacks.on_action_end(action)
                 if done:
                     warnings.warn('Env ended before {} random steps could be performed at the start. You should probably lower the `nb_max_start_steps` parameter.'.format(nb_random_start_steps))
-                    observation = deepcopy(env.reset())
+                    observation = env.reset()
                     if self.processor is not None:
                         observation = self.processor.process_observation(observation)
                     break
@@ -346,10 +350,9 @@ class Agent(object):
                 accumulated_info = {}
                 for _ in range(action_repetition):
                     callbacks.on_action_begin(action)
-                    observation, r, d, info = env.step(action)
-                    observation = deepcopy(observation)
+                    raw_observation, r, d, info = env.step(action)
                     if self.processor is not None:
-                        observation, r, d, info = self.processor.process_step(observation, r, d, info)
+                        observation, r, d, info = self.processor.process_step(raw_observation, r, d, info)
                     callbacks.on_action_end(action)
                     reward += r
                     for key, value in info.items():
@@ -369,6 +372,7 @@ class Agent(object):
                 step_logs = {
                     'action': action,
                     'observation': observation,
+                    'raw_observation': raw_observation,
                     'reward': reward,
                     'episode': episode,
                     'info': accumulated_info,
