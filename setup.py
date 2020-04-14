@@ -10,6 +10,6 @@ setup(name='keras-rl',
       url='https://github.com/keras-rl/keras-rl',
       download_url='https://github.com/keras-rl/keras-rl/archive/v0.4.0.tar.gz',
       license='MIT',
-      install_requires=['numpy', 'gym[atari]', 'keras>=2.0.7', 'tensorflow~=2.1'],
+      install_requires=['numpy', 'gym[atari]', 'tensorflow~=2.1'],
       extras_require={},
       packages=find_packages())

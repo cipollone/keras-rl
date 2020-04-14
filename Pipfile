@@ -9,7 +9,6 @@ keras-rl = {editable = true,path = "."}
 
 [packages]
 numpy = "*"
+gym = {extras = ["atari"],version = "*"}
 pillow = "*"
 tensorflow = "~=2.1"
-keras = ">=2.0.7"
-gym = {extras = ["atari"],version = "*"}
