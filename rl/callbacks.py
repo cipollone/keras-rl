@@ -481,3 +481,4 @@ class ModelIntervalCheckpoint(Callback):
         if self.verbose > 0:
             print('Step {}: saving model to {}'.format(self.total_steps, filepath))
         self.model.save_weights(filepath, overwrite=True)
+        # TODO: this seems broken: where is model? I don't use this class though

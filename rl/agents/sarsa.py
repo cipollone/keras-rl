@@ -103,8 +103,9 @@ class SARSAAgent(Agent):
     def load_weights(self, filepath):
         self.model.load_weights(filepath)
 
-    def save_weights(self, filepath, overwrite=False):
-        self.model.save_weights(filepath, overwrite=overwrite)
+    def save_weights(self, filepath, overwrite=False, save_format="h5"):
+        self.model.save_weights(
+            filepath, overwrite=overwrite, save_format=save_format)
 
     def reset_states(self):
         self.actions = collections.deque(maxlen=2)

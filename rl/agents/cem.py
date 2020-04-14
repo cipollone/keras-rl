@@ -57,8 +57,9 @@ class CEMAgent(Agent):
     def load_weights(self, filepath):
         self.model.load_weights(filepath)
 
-    def save_weights(self, filepath, overwrite=False):
-        self.model.save_weights(filepath, overwrite=overwrite)
+    def save_weights(self, filepath, overwrite=False, save_format="h5"):
+        self.model.save_weights(
+            filepath, overwrite=overwrite, save_format=save_format)
 
     def get_weights_flat(self,weights):
         weights_flat = np.zeros(self.num_weights)

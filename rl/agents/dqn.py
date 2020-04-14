@@ -212,8 +212,9 @@ class DQNAgent(AbstractDQNAgent):
         self.model.load_weights(filepath)
         self.update_target_model_hard()
 
-    def save_weights(self, filepath, overwrite=False):
-        self.model.save_weights(filepath, overwrite=overwrite)
+    def save_weights(self, filepath, overwrite=False, save_format="h5"):
+        self.model.save_weights(
+            filepath, overwrite=overwrite, save_format=save_format)
 
     def reset_states(self):
         self.recent_action = None
@@ -578,8 +579,9 @@ class NAFAgent(AbstractDQNAgent):
         self.combined_model.load_weights(filepath)  # updates V, L and mu model since the weights are shared
         self.update_target_model_hard()
 
-    def save_weights(self, filepath, overwrite=False):
-        self.combined_model.save_weights(filepath, overwrite=overwrite)
+    def save_weights(self, filepath, overwrite=False, save_format="h5"):
+        self.combined_model.save_weights(
+            filepath, overwrite=overwrite, save_format=save_format)
 
     def reset_states(self):
         if self.random_process is not None:
