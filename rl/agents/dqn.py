@@ -67,8 +67,8 @@ class AbstractDQNAgent(Agent):
         return q_values
 
     def compute_q_values(self, state):
-        q_values = self.compute_batch_q_values([state])
-        q_values = tf.reshape(q_values, [-1])
+        q_values = self.compute_batch_q_values([state]).numpy()
+        q_values = np.reshape(q_values, -1)
         assert q_values.shape == (self.nb_actions,)
         return q_values
 
@@ -292,12 +292,9 @@ class DQNAgent(AbstractDQNAgent):
 
                 # Now, estimate Q values using the target network but select the values with the
                 # highest Q value wrt to the online model (as computed above).
-                target_q_values = self.target_model.predict_on_batch(state1_batch)
+                target_q_values = self.target_model.predict_on_batch(state1_batch).numpy()
                 assert target_q_values.shape == (self.batch_size, self.nb_actions)
-                actions = tf.expand_dims(actions, -1)
-                rows = tf.expand_dims(tf.range(self.batch_size, dtype=tf.int64), -1)
-                indices = tf.concat([rows, actions], axis=-1)
-                q_batch = tf.gather_nd(target_q_values, indices)
+                q_batch = target_q_values[range(self.batch_size), actions]
             else:
                 # Compute the q_values given state1, and extract the maximum for each sample in the batch.
                 # We perform this prediction on the target_model instead of the model for reasons
