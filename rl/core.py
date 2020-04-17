@@ -587,6 +587,23 @@ class Processor(object):
         """
         return batch
 
+    def process_memory(self, observation, action, reward, terminal):
+        """Process the recent data, before adding them to memory.
+
+        NOTE: Only dqn agent is mantained. Other agent might not call this.
+
+        # Arguments
+            observation (dict): Observation returned by environment
+            action (int): Action taken after this observation
+            reward (float): Reward obtained by taking this action
+            terminal (boolean): Is the state terminal
+
+        # Returns
+            Processed (observation, action, reward, terminal) 
+        """
+
+        return observation, action, reward, terminal
+
     @property
     def metrics(self):
         """The metrics of the processor, which will be reported during training.
