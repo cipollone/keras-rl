@@ -10,5 +10,4 @@ keras-rl = {editable = true,path = "."}
 [packages]
 numpy = "*"
 gym = {extras = ["atari"],version = "*"}
-pillow = "*"
 tensorflow = "~=2.1"

@@ -138,7 +138,7 @@ class Memory(object):
                 break
             state.insert(0, self.recent_observations[current_idx])
         while len(state) < self.window_length:
-            state.insert(0, zeroed_observation(state[0]))
+            state.insert(0, np.copy(state[0]))
         return state
 
     def get_config(self):
@@ -218,7 +218,7 @@ class SequentialMemory(Memory):
                     break
                 state0.insert(0, self.observations[current_idx])
             while len(state0) < self.window_length:
-                state0.insert(0, zeroed_observation(state0[0]))
+                state0.insert(0, np.copy(state0[0]))
             action = self.actions[idx - 1]
             reward = self.rewards[idx - 1]
             terminal1 = self.terminals[idx - 1]
